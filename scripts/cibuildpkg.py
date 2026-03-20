@@ -441,6 +441,13 @@ class Builder:
 
         # apply patch
         if os.path.exists(patch):
+            print(f"\n=== Applying patch: {patch} ===")
+
+            with open(patch, encoding="utf-8") as patch_file:
+                patch_content = patch_file.read()
+            print(patch_content, end="" if patch_content.endswith("\n") else "\n")
+            print("\n=== End patch ===")
+
             run(["patch", "-d", path, "-i", patch, "-p1"])
 
     def _environment(self, *, for_builder: bool) -> dict[str, str]:
