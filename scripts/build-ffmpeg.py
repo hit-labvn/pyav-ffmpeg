@@ -335,7 +335,6 @@ def main():
         )
 
     ffmpeg_package.build_arguments = [
-        "--disable-programs",
         "--disable-doc",
         "--disable-libxml2",
         "--disable-lzma",  # or re-add xz package
