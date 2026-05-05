@@ -69,7 +69,7 @@ codec_group = [
     ),
     Package(
         name="ogg",
-        source_url="http://downloads.xiph.org/releases/ogg/libogg-1.3.6.tar.gz",
+        source_url="https://ftp.osuosl.org/pub/xiph/releases/ogg/libogg-1.3.6.tar.gz",
         sha256="83e6704730683d004d20e21b8f7f55dcb3383cdf84c0daedf30bde175f774638",
     ),
     Package(
@@ -80,7 +80,7 @@ codec_group = [
     ),
     Package(
         name="speex",
-        source_url="http://downloads.xiph.org/releases/speex/speex-1.2.1.tar.gz",
+        source_url="https://ftp.osuosl.org/pub/xiph/releases/speex/speex-1.2.1.tar.gz",
         sha256="4b44d4f2b38a370a2d98a78329fefc56a0cf93d1c1be70029217baae6628feea",
         build_arguments=["--disable-binaries"],
     ),
