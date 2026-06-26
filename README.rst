@@ -7,34 +7,30 @@ users to easily install PyAV without perform error-prone compilations.
 
 The builds are provided for several platforms:
 
-- Linux (x86_64, aarch64, ppc64le)
+- Linux (x86_64, aarch64, armv7l, ppc64le, riscv64)
 - macOS (x86_64, arm64)
-- Windows (x86_64)
+- Windows (x86_64, aarch64)
 
 Features
 --------
 
-Currently FFmpeg 8.0.1 is built with the following packages enabled for all platforms:
+Currently FFmpeg 8.1.1 is built with the following packages enabled for all platforms:
 
 - lame 3.100
-- ogg 1.3.6
 - opus 1.6.1
-- speex 1.2.1
-- vorbis 1.3.7
 - dav1d 1.5.3
-- libsvtav1 3.1.2
-- vpx 1.15.2
-- png 1.6.54
-- webp 1.5.0
-- openh264 2.6.0
+- libsvtav1 4.1.0
+- vpx 1.16.0
+- png 1.6.58
+- webp 1.6.0
 - opencore-amr 0.1.6
-- x264 32c3b801191522961102d4bea292cdb61068d0dd
-- x265 4.1
+- x264 32c3b801191522961102d4bea292cdb61068d0dd (except armv7l)
+- x265 4.2 (except armv7l)
 
 The following additional packages are also enabled on Linux:
 
-- gnutls 3.8.11
+- gnutls 3.8.13
 - nettle 3.10.2
-- unistring 1.4.1
+- unistring 1.4.2
 
 .. _PyAV: https://github.com/PyAV-Org/PyAV
