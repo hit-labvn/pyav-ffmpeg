@@ -1,13 +1,9 @@
 name: build-ffmpeg
 on:
-  push:
-    branches: main
-    paths-ignore:
-      - '**.md'
-      - '**.rst'
-      - '**.txt'
   pull_request:
-    branches: main
+    branches:
+      - main
+      - main-dev
     paths-ignore:
       - '**.md'
       - '**.rst'
