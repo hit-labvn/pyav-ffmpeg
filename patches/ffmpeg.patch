@@ -98,7 +98,7 @@ index 6e97304..6a55584 100644
                  par->bits_per_coded_sample = bih->biBitCount;
                  if (par->height < 0) {
                      par->height *= -1;
-@@ -1877,8 +1905,11 @@ static int dshow_read_packet(AVFormatContext *s, AVPacket *pkt)
+@@ -1877,7 +1905,9 @@ static int dshow_read_packet(AVFormatContext *s, AVPacket *pkt)
              } else if (s->flags & AVFMT_FLAG_NONBLOCK) {
                  return AVERROR(EAGAIN);
              } else {
@@ -109,3 +109,4 @@ index 6e97304..6a55584 100644
              }
          }
      }
+
