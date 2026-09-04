@@ -25,15 +25,7 @@ diff --git a/libavdevice/dshow.c b/libavdevice/dshow.c
 index 6e97304..6a55584 100644
 --- a/libavdevice/dshow.c
 +++ b/libavdevice/dshow.c
-@@ -26,6 +26,7 @@
- #include "libavutil/mem.h"
- #include "libavformat/demux.h"
- #include "libavformat/internal.h"
-+#include "libavformat/url.h"
- #include "libavformat/riff.h"
- #include "avdevice.h"
- #include "libavcodec/raw.h"
-@@ -56,6 +57,10 @@
+@@ -56,6 +56,10 @@
  #   define AMCONTROL_COLORINFO_PRESENT 0x00000080 // if set, indicates DXVA color info is present in the upper (24) bits of the dwControlFlags
  #endif
 -
@@ -98,12 +90,13 @@ index 6e97304..6a55584 100644
                  par->bits_per_coded_sample = bih->biBitCount;
                  if (par->height < 0) {
                      par->height *= -1;
-@@ -1877,7 +1905,9 @@ static int dshow_read_packet(AVFormatContext *s, AVPacket *pkt)
+@@ -1877,7 +1904,10 @@ static int dshow_read_packet(AVFormatContext *s, AVPacket *pkt)
              } else if (s->flags & AVFMT_FLAG_NONBLOCK) {
                  return AVERROR(EAGAIN);
              } else {
 -                WaitForMultipleObjects(2, ctx->event, 0, INFINITE);
-+                if (ff_check_interrupt(&s->interrupt_callback))
++                if (s->interrupt_callback.callback &&
++                    s->interrupt_callback.callback(s->interrupt_callback.opaque))
 +                    return AVERROR_EXIT;
 +                WaitForMultipleObjects(2, ctx->event, 0, 100);
              }
