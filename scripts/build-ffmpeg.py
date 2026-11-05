@@ -93,6 +93,7 @@ def main():
     is_arm32 = machine in {"armv7l", "armv8l", "arm"}
     is_arm = machine in {"arm64", "aarch64"} or is_arm32
     is_riscv = machine in {"riscv64"}
+    is_x86 = machine in {"x86_64", "amd64", "i686", "i386"}
 
     use_alsa = plat == "Linux"
     # CUDA, AMF, and Intel VPL are not available on ARM64 Windows
@@ -169,6 +170,7 @@ def main():
         "--enable-version3",
         "--enable-alsa" if use_alsa else "--disable-alsa",
         "--enable-gnutls" if use_gnutls else "--disable-gnutls",
+        "--enable-libass",
         "--enable-libdav1d",
         "--enable-libmp3lame",
         "--enable-libopus",
@@ -223,8 +225,7 @@ def main():
 
     ffmpeg_package.build_arguments.extend(
         [
-            "--disable-encoder=avui,dca,mlp,opus,s302m,sonic,sonic_ls,truehd",
-            "--disable-decoder=sonic",
+            "--disable-encoder=avui,dca,mlp,opus,s302m,truehd",
             "--disable-libjack",
             "--disable-indev=jack",
             "--disable-filter=gfxcapture",  # gfxcapture_winrt C++ causes build failure on Win Arm
@@ -232,7 +233,7 @@ def main():
     )
 
     packages = []
-    if plat != "Darwin" and "nasm" not in available_tools and machine in {"x86_64", "amd64", "i686", "i386"}:
+    if "nasm" not in available_tools and is_x86:
         packages.append(nasm_package)
     if use_alsa:
         packages += [alsa_package]
@@ -250,7 +251,20 @@ def main():
         packages += [p for p in codec_group if p.name != "x264"]
     else:
         packages += codec_group
+    packages += ass_group
     packages += [ffmpeg_package]
+
+    # Where libass finds the system's fonts. Linux has no provider without
+    # fontconfig. It has x86 (nasm) and aarch64 assembly; elsewhere it's plain C.
+    for pkg in packages:
+        if pkg.name == "libass":
+            pkg.build_arguments += [
+                "-Dcoretext=" + ("enabled" if plat == "Darwin" else "disabled"),
+                "-Ddirectwrite=" + ("enabled" if plat == "Windows" else "disabled"),
+                "-Drequire-system-font-provider="
+                + ("false" if plat == "Linux" else "true"),
+                "-Dasm=" + ("enabled" if is_x86 or (is_arm and not is_arm32) else "disabled"),
+            ]
 
     # Disable runtime CPU detection for opus on Windows ARM64
     # (no CPU detection method available for this platform)

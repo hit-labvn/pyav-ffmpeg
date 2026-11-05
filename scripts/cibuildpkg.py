@@ -95,7 +95,7 @@ class Builder:
 
         with log_group(f"build {package.name}"):
             self._extract(package)
-            if package.name == "lamer":
+            if package.name == "bwlame":
                 self._build_lame(package, for_builder=for_builder)
             elif package.name == "x265":
                 self._build_x265(package)
@@ -164,7 +164,7 @@ class Builder:
             run(install_command, env=env)
 
     def _build_lame(self, package: Package, for_builder: bool) -> None:
-        # basswood-io/lamer builds libmp3lame with a plain Makefile. Build only
+        # basswood-io/bwlame builds libmp3lame with a plain Makefile. Build only
         # the static encoder library (the `lib` target, not the ncurses CLI
         # frontend) as position-independent code -- it is
         # linked into the shared libavcodec -- then install it where FFmpeg's
@@ -225,9 +225,7 @@ class Builder:
         ]
 
         if package.name == "x264":
-            # Disable asm on Windows ARM64 (no nasm available)
             if platform.system() == "Windows" and platform.machine().lower() in {"arm64", "aarch64"}:
-                configure_args.append("--disable-asm")
                 # Specify host to ensure correct resource compiler target
                 configure_args.append("--host=aarch64-w64-mingw32")
 
@@ -333,7 +331,7 @@ class Builder:
         # determine meson arguments
         env = self._environment(for_builder=for_builder)
         prefix = self._prefix(for_builder=for_builder)
-        meson_args = ["--libdir=lib", "--prefix=" + prefix]
+        meson_args = ["--buildtype=release", "--libdir=lib", "--prefix=" + prefix]
 
         # build package
         os.makedirs(package_build_path, exist_ok=True)
@@ -360,18 +358,19 @@ class Builder:
         # builds in dummy directory
         dummy_install_path = os.path.join(package_path, "dummy_install_path")
 
-        # For 10/12 bits version, only x86_64 has assembly instructions available
+        # For 10/12 bits version, only x86_64 and AArch64 have assembly
+        # instructions available.
         flags_high_bits = []
 
         disable_sve = platform.system() == "Linux" and platform.machine() == "aarch64"
-        if platform.machine() not in {"x86_64", "amd64"}:
+        if platform.machine().lower() not in {"x86_64", "amd64", "arm64", "aarch64"}:
             flags_high_bits.append("-DENABLE_ASSEMBLY=0")
             flags_high_bits.append("-DENABLE_ALTIVEC=0")
 
-            if disable_sve:
-                flags_high_bits.append("-DENABLE_SVE2=OFF")
+        if disable_sve:
+            flags_high_bits.append("-DENABLE_SVE2=OFF")
 
-        # x265 greps /proc/cpuinfo for NEON, which reports the aarch64 host's
+        # x265 greps /proc/cpuinfo for NEON, which reports the AArch64 host's
         # flags ("asimd") inside the 32-bit ARM container. Its NEON .S files are
         # assembled regardless, so tell it NEON is there or they get -mfpu=vfp.
         arm32_flags = (

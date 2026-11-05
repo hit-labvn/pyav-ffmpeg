@@ -1,13 +1,13 @@
 name: build-ffmpeg
 on:
   push:
-    branches: main
+    branches: master
     paths-ignore:
       - '**.md'
       - '**.rst'
       - '**.txt'
   pull_request:
-    branches: main
+    branches: master
     paths-ignore:
       - '**.md'
       - '**.rst'
@@ -20,14 +20,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.14"
       - name: Make cache file
         run: python scripts/cache.py
       - name: Cache tarballs
         id: cache-tarballs
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: source
           key: tarballs-${{ hashFiles('cache.txt') }}
@@ -47,7 +47,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: macos-14
+          - os: macos-15
             arch: arm64
             shell: bash
           - os: macos-15-intel
@@ -74,7 +74,7 @@ jobs:
         shell: ${{ matrix.shell }}
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.14"
       - name: Get sources
@@ -94,9 +94,6 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           brew unlink gettext libidn2 libpng libtiff libunistring libx11 libxcb libxdmcp
-          if [ "${{ matrix.os }}" = "macos-15-intel" ]; then
-            brew install nasm
-          fi
       - uses: msys2/setup-msys2@v2
         if: runner.os == 'Windows'
         with:
@@ -112,7 +109,7 @@ jobs:
           CIBW_ARCHS: ${{ matrix.msys_system == 'CLANGARM64' && 'ARM64' || (matrix.msys_prefix && 'AMD64' || matrix.arch) }}
           CIBW_BEFORE_BUILD: python scripts/build-ffmpeg.py /tmp/vendor
           CIBW_BEFORE_BUILD_WINDOWS: python scripts\build-ffmpeg.py C:\cibw\vendor
-          CIBW_BUILD: cp311-*
+          CIBW_BUILD: cp312-*
           CIBW_REPAIR_WHEEL_COMMAND_LINUX: LD_LIBRARY_PATH=/tmp/vendor/lib:$LD_LIBRARY_PATH auditwheel repair --exclude libmvec.so.1 --exclude libmvec-2.so --exclude libmvec.so --exclude libmvec -w {dest_dir} {wheel}
           CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: delvewheel repair --add-path C:\cibw\vendor\bin -w {dest_dir} {wheel}
           CIBW_TEST_COMMAND: python -c "import dummy"
@@ -121,7 +118,7 @@ jobs:
           cibuildwheel --output-dir output
           rm -f output/*.whl
       - name: Upload FFmpeg
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: output-${{ matrix.os }}
           path: output/
@@ -139,7 +136,7 @@ jobs:
         arch: [ "armv7l", "ppc64le", "riscv64" ]
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.14"
       - name: Get sources
@@ -153,14 +150,13 @@ jobs:
           CIBW_ARCHS: ${{ matrix.arch }}
           CIBW_BEFORE_ALL_LINUX: ./scripts/install-static-clang.sh
           CIBW_BEFORE_BUILD_LINUX: python scripts/build-ffmpeg.py /tmp/vendor
-          CIBW_BUILD: cp311-${{ matrix.build }}${{ matrix.arch }}
+          CIBW_BUILD: cp312-${{ matrix.build }}${{ matrix.arch }}
           CIBW_ENVIRONMENT_LINUX: >
             CC="/opt/clang/bin/clang"
             CXX="/opt/clang/bin/clang++"
             LDFLAGS="-fuse-ld=lld"
           CIBW_ENVIRONMENT_PASS_LINUX: RUNNER_ARCH
           CIBW_REPAIR_WHEEL_COMMAND_LINUX: LD_LIBRARY_PATH=/tmp/vendor/lib:$LD_LIBRARY_PATH auditwheel repair --exclude libmvec.so.1 --exclude libmvec-2.so --exclude libmvec.so --exclude libmvec -w {dest_dir} {wheel}
-          CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: delvewheel repair --add-path C:\cibw\vendor\bin -w {dest_dir} {wheel}
           CIBW_TEST_COMMAND: python -c "import dummy"
         run: |
           pip install cibuildwheel delvewheel

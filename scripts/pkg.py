@@ -30,8 +30,8 @@ gnutls_group = [
     ),
     Package(
         name="unistring",
-        source_url="https://ftp.gnu.org/gnu/libunistring/libunistring-1.4.2.tar.gz",
-        sha256="e82664b170064e62331962126b259d452d53b227bb4a93ab20040d846fec01d8",
+        source_url="https://ftp.gnu.org/gnu/libunistring/libunistring-1.5.tar.gz",
+        sha256="5b0ecd46cbf225375f20ab4056197e66a7ac590e2684c069af407ae3383c9d81",
     ),
     Package(
         name="nettle",
@@ -61,10 +61,10 @@ gnutls_group = [
 
 codec_group = [
     Package(
-        name="lamer",
-        source_url="https://github.com/basswood-io/lamer/archive/refs/tags/v3.101.0.tar.gz",
-        source_filename="lamer-3.101.0.tar.gz",
-        sha256="81839b16fdc401e20b73389d05f32a7656008f43bcb960feff290d6f08fc109e",
+        name="bwlame",
+        source_url="https://github.com/basswood-io/bwlame/archive/refs/tags/v4.1.0.tar.gz",
+        source_filename="bwlame-4.1.0.tar.gz",
+        sha256="f07647a8db7cf511cb6a82e69483bc3c1ad87355995a74193801029c368cb45c",
         build_system="make",
     ),
     Package(
@@ -83,29 +83,22 @@ codec_group = [
     ),
     Package(
         name="libsvtav1",
-        source_url="https://gitlab.com/AOMediaCodec/SVT-AV1/-/archive/v4.2.0/SVT-AV1-v4.2.0.tar.bz2",
-        sha256="512f2ea5649e3e76c2dddcc25c2556fb67a9582baaab207c9c96161c94659dad",
+        source_url="https://gitlab.com/AOMediaCodec/SVT-AV1/-/archive/v4.3.0/SVT-AV1-v4.3.0.tar.bz2",
+        sha256="9223ce06e6172ad41357ed23b3b00f036e03794b86b0e20ea9ccb3f648b8955d",
         build_system="cmake",
         build_arguments=["-DBUILD_APPS=OFF", "-DBUILD_DEC=OFF", "-DBUILD_ENC=ON", "-DENABLE_NASM=ON"],
     ),
     Package(
         name="vpx",
-        source_url="https://github.com/webmproject/libvpx/archive/refs/tags/v1.16.0.tar.gz",
-        sha256="7a479a3c66b9f5d5542a4c6a1b7d3768a983b1e5c14c60a9396edc9b649e015c",
-        source_filename="vpx-1.16.0.tar.gz",
+        source_url="https://github.com/webmproject/libvpx/archive/refs/tags/v1.17.0.tar.gz",
+        sha256="1020f184046187baa2985dbde38e0691f49c44088bca7a1842b0236c6081dc0a",
+        source_filename="vpx-1.17.0.tar.gz",
         build_arguments=[
             "--disable-examples",
             "--disable-tools",
             "--disable-unit-tests",
             "--disable-dependency-tracking",
         ],
-    ),
-    Package(
-        name="png",
-        source_url="https://downloads.sourceforge.net/project/libpng/libpng16/1.6.58/libpng-1.6.58.tar.xz",
-        sha256="28eb403f51f0f7405249132cecfe82ea5c0ef97f1b32c5a65828814ae0d34775",
-        # avoid an assembler error on Windows
-        build_arguments=["PNG_COPTS=-fno-asynchronous-unwind-tables"],
     ),
     Package(
         name="webp",
@@ -118,7 +111,7 @@ codec_group = [
             "-DWEBP_BUILD_CWEBP=OFF",
             "-DWEBP_BUILD_DWEBP=OFF",
             "-DWEBP_BUILD_GIF2WEBP=OFF",
-            "-DWE[118;1:3uBP_BUILD_IMG2WEBP=OFF",
+            "-DWEBP_BUILD_IMG2WEBP=OFF",
             "-DWEBP_BUILD_VWEBP=OFF",
             "-DWEBP_BUILD_WEBPINFO=OFF",
             "-DWEBP_BUILD_WEBPMUX=OFF",
@@ -127,9 +120,9 @@ codec_group = [
     ),
     Package(
         name="libvmaf",
-        source_url="https://github.com/Netflix/vmaf/archive/refs/tags/v3.2.0.tar.gz",
-        source_filename="vmaf-3.2.0.tar.gz",
-        sha256="a28f93f3b4fa65601be324587072e32a6a704a304ba7b1aec9b70b3f709bc1dc",
+        source_url="https://github.com/Netflix/vmaf/archive/refs/tags/v3.2.1.tar.gz",
+        source_filename="vmaf-3.2.1.tar.gz",
+        sha256="5df7386911bc15fd1ca783132528748d219768ae4fc5f8e0b61184f041648092",
         build_system="meson",
         source_dir="libvmaf",
         requires=["nasm"],
@@ -157,31 +150,98 @@ codec_group = [
     ),
 ]
 
+# libass and its dependencies. Fontconfig is not built: libass uses CoreText on
+# macOS and DirectWrite on Windows, and on Linux only fonts given by path or
+# attached to the file.
+ass_group = [
+    Package(
+        name="freetype",
+        source_url="https://download.savannah.gnu.org/releases/freetype/freetype-2.15.0.tar.xz",
+        sha256="93cd47eb719c325107f2d3cf087d06299e944c3b48a40b55537302304dea1dd5",
+        build_system="cmake",
+        build_arguments=[
+            "-DFT_DISABLE_ZLIB=ON",
+            "-DFT_DISABLE_BZIP2=ON",
+            "-DFT_DISABLE_PNG=ON",
+            "-DFT_DISABLE_HARFBUZZ=ON",
+            "-DFT_DISABLE_BROTLI=ON",
+            "-DFT_DISABLE_HVF=ON",
+        ],
+    ),
+    Package(
+        name="fribidi",
+        source_url="https://github.com/fribidi/fribidi/releases/download/v1.0.17/fribidi-1.0.17.tar.xz",
+        sha256="6949dcde27d41cebad1fd741fcafc36d55a1020d2d872d4a6eb3914caabbada2",
+        build_system="meson",
+        build_arguments=["-Ddocs=false", "-Dbin=false", "-Dtests=false"],
+    ),
+    Package(
+        name="harfbuzz",
+        source_url="https://github.com/harfbuzz/harfbuzz/releases/download/15.0.0/harfbuzz-15.0.0.tar.xz",
+        sha256="968536e9abd782f07f7954044c0c4020199fcdd39b41d221ec42d2a3be4a44df",
+        build_system="meson",
+        build_arguments=[
+            "--auto-features=disabled",
+            "-Dtests=disabled",
+            "-Ddocs=disabled",
+            "-Dutilities=disabled",
+            "-Dintrospection=disabled",
+            "-Dbenchmark=disabled",
+            "-Draster=disabled",
+            "-Dvector=disabled",
+            "-Dgpu=disabled",
+            "-Dsubset=disabled",
+        ],
+    ),
+    Package(
+        name="libunibreak",
+        source_url="https://github.com/adah1972/libunibreak/releases/download/libunibreak_8_0/libunibreak-8.0.tar.gz",
+        sha256="9c4fad6e517338a098373acc9f35579ae2c325e6446666fb9ac2666ba15ceba4",
+    ),
+    Package(
+        name="libass",
+        source_url="https://github.com/libass/libass/releases/download/0.17.5/libass-0.17.5.tar.xz",
+        sha256="2dca25c0e0c837ddf00b52011b3f82cac1e4ddd3ad018227806b0c2288864acc",
+        build_system="meson",
+        requires=["freetype", "fribidi", "harfbuzz", "libunibreak"],
+        build_arguments=[
+            "--auto-features=disabled",
+            "-Dtest=disabled",
+            "-Dcompare=disabled",
+            "-Dprofile=disabled",
+            "-Dfuzz=disabled",
+            "-Dcheckasm=disabled",
+            "-Dlibunibreak=enabled",
+            "-Dfontconfig=disabled",
+        ],
+    ),
+]
+
 alsa_package = Package(
     name="alsa-lib",
-    source_url="https://www.alsa-project.org/files/pub/lib/alsa-lib-1.2.14.tar.bz2",
-    sha256="be9c88a0b3604367dd74167a2b754a35e142f670292ae47a2fdef27a2ee97a32",
+    source_url="https://www.alsa-project.org/files/pub/lib/alsa-lib-1.2.16.1.tar.bz2",
+    sha256="f740db7f488255944ffd4428416ee3390a96742856916433df468c281436480e",
     build_arguments=["--disable-python"],
 )
 
 nvheaders_package = Package(
     name="nv-codec-headers",
-    source_url="https://github.com/FFmpeg/nv-codec-headers/archive/refs/tags/n13.0.19.0.tar.gz",
-    sha256="86d15d1a7c0ac73a0eafdfc57bebfeba7da8264595bf531cf4d8db1c22940116",
+    source_url="https://github.com/FFmpeg/nv-codec-headers/archive/refs/tags/n13.0.19.1.tar.gz",
+    sha256="c293161bd92dac53f2f8fab08abcd4f96773c3644a57b23c2260b4be2311ab2f",
     build_system="make",
 )
 
 amfheaders_package = Package(
     name="amf-headers",
-    source_url="https://github.com/GPUOpen-LibrariesAndSDKs/AMF/releases/download/v1.5.2/AMF-headers-v1.5.2.tar.gz",
-    sha256="d3c12eb324edf05e214608b6a395a51dd95770ed9d45520185d6c3a206811c99",
+    source_url="https://github.com/GPUOpen-LibrariesAndSDKs/AMF/releases/download/v1.5.3/AMF-headers-v1.5.3.tar.gz",
+    sha256="0f521ad98041f8001147cded4a660127f18b1c27a801a5cd691bda1fa48381be",
     build_system="make",
 )
 
 libvpl_package = Package(
     name="libvpl",
-    source_url="https://github.com/intel/libvpl/archive/refs/tags/v2.16.0.tar.gz",
-    sha256="d60931937426130ddad9f1975c010543f0da99e67edb1c6070656b7947f633b6",
+    source_url="https://github.com/intel/libvpl/archive/refs/tags/v2.17.0.tar.gz",
+    sha256="4de3e2faf1e8307fb282e4a43f443191810f6a6b0a484fffa7995ba1c814c6ec",
     build_system="cmake",
     build_arguments=[
         "-DINSTALL_LIB=ON",
@@ -195,18 +255,19 @@ libvpl_package = Package(
 
 nasm_package = Package(
     name="nasm",
-    source_url="https://www.nasm.us/pub/nasm/releasebuilds/2.16.03/nasm-2.16.03.tar.xz",
-    sha256="1412a1c760bbd05db026b6c0d1657affd6631cd0a63cddb6f73cc6d4aa616148",
+    source_url="https://www.nasm.us/pub/nasm/releasebuilds/3.02/nasm-3.02.tar.xz",
+    sha256="87336eba53b4acfe917424ab5d500d2b0054d9f5148d35c2273ccf2cfb712f0d",
 )
 
 ffmpeg_package = Package(
     name="ffmpeg",
-    source_url="https://ffmpeg.org/releases/ffmpeg-9.0.1.tar.xz",
-    sha256="cf38e0e28c7e5605942c4a77755349b0145804a397af37eb1fb4c77cb237f635",
+    source_url="https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.xz",
+    sha256="8c3850283eb25fa026482078a04051e0be17347b09ef81a0849bec15a96e002e",
 )
 
 all_packages: list[Package] = [ffmpeg_package]
 all_packages.extend(codec_group)
+all_packages.extend(ass_group)
 all_packages.extend(gnutls_group) 
 all_packages.extend(
     [nasm_package, alsa_package, nvheaders_package, amfheaders_package, libvpl_package]
