@@ -111,7 +111,7 @@ def main():
     if plat == "Linux" and os.environ.get("CIBUILDWHEEL") == "1":
         output_dir = "/output"
 
-    output_tarball = os.path.join(output_dir, make_tarball_name() + ".tar.gz")
+    output_tarball = os.path.join(output_dir, make_tarball_name() + "-lgpl.tar.gz")
     if os.path.exists(output_tarball):
         return
 
@@ -182,11 +182,6 @@ def main():
         "--enable-zlib",
     ]
 
-    # x264 is skipped on 32-bit ARM (armv7)
-    ffmpeg_package.build_arguments.append("--enable-libx265")
-    if not is_arm32:
-        ffmpeg_package.build_arguments.append("--enable-libx264")
-
     if use_cuda:
         ffmpeg_package.build_arguments.extend(["--enable-nvenc", "--enable-nvdec"])
 
@@ -246,11 +241,7 @@ def main():
 
     if use_gnutls:
         packages += gnutls_group
-    if is_arm32:
-        # x264 is not built on 32-bit ARM (armv7)
-        packages += [p for p in codec_group if p.name != "x264"]
-    else:
-        packages += codec_group
+    packages += codec_group
     packages += ass_group
     packages += [ffmpeg_package]
 
