@@ -104,6 +104,9 @@ def main():
     # hardware encoders/decoders on modern integrated and discrete Intel GPUs.
     use_libvpl = plat in {"Linux", "Windows"} and not is_arm
 
+    # FFmpeg only needs the headers. It loads the Vulkan library from the system at runtime.
+    use_vulkan = plat in {"Linux", "Windows"} and is_x86
+
     # Use GnuTLS only on Linux, FFmpeg has native TLS backends for macOS and Windows.
     use_gnutls = plat == "Linux"
 
@@ -191,6 +194,9 @@ def main():
     if use_libvpl:
         ffmpeg_package.build_arguments.append("--enable-libvpl")
 
+    if use_vulkan:
+        ffmpeg_package.build_arguments.append("--enable-vulkan")
+
     if plat == "Darwin":
         ffmpeg_package.build_arguments.extend(
             [
@@ -238,6 +244,8 @@ def main():
         packages += [amfheaders_package]
     if use_libvpl:
         packages += [libvpl_package]
+    if use_vulkan:
+        packages += [vulkanheaders_package]
 
     if use_gnutls:
         packages += gnutls_group

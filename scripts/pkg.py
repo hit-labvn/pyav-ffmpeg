@@ -237,6 +237,18 @@ libvpl_package = Package(
     ],
 )
 
+vulkanheaders_package = Package(
+    name="vulkan-headers",
+    source_url="https://github.com/KhronosGroup/Vulkan-Headers/archive/refs/tags/v1.4.350.tar.gz",
+    source_filename="vulkan-headers-1.4.350.tar.gz",
+    sha256="6dd105e5cc7ddab6e7b611ae2c1872740d1727557cc8bf9daf13d6de1e4b3999",
+    build_system="cmake",
+    build_arguments=[
+        "-DVULKAN_HEADERS_ENABLE_TESTS=OFF",
+        "-DVULKAN_HEADERS_ENABLE_MODULE=OFF",
+    ],
+)
+
 nasm_package = Package(
     name="nasm",
     source_url="https://www.nasm.us/pub/nasm/releasebuilds/3.02/nasm-3.02.tar.xz",
@@ -254,5 +266,12 @@ all_packages.extend(codec_group)
 all_packages.extend(ass_group)
 all_packages.extend(gnutls_group) 
 all_packages.extend(
-    [nasm_package, alsa_package, nvheaders_package, amfheaders_package, libvpl_package]
+    [
+        nasm_package,
+        alsa_package,
+        nvheaders_package,
+        amfheaders_package,
+        libvpl_package,
+        vulkanheaders_package,
+    ]
 )
