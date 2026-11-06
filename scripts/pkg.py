@@ -23,19 +23,19 @@ is_musllinux = plat == "Linux" and platform.libc_ver()[0] != "glibc"
 gnutls_group = [
     Package(
         name="gmp",
-        source_url="https://ftp.gnu.org/gnu/gmp/gmp-6.3.0.tar.xz",
+        source_url="https://ftpmirror.gnu.org/gmp/gmp-6.3.0.tar.xz",
         sha256="a3c2b80201b89e68616f4ad30bc66aee4927c3ce50e33929ca819d5c43538898",
         # out-of-tree builds fail on Windows
         build_dir=".",
     ),
     Package(
         name="unistring",
-        source_url="https://ftp.gnu.org/gnu/libunistring/libunistring-1.5.tar.gz",
+        source_url="https://ftpmirror.gnu.org/libunistring/libunistring-1.5.tar.gz",
         sha256="5b0ecd46cbf225375f20ab4056197e66a7ac590e2684c069af407ae3383c9d81",
     ),
     Package(
         name="nettle",
-        source_url="https://ftp.gnu.org/gnu/nettle/nettle-4.0.tar.gz",
+        source_url="https://ftpmirror.gnu.org/nettle/nettle-4.0.tar.gz",
         sha256="3addbc00da01846b232fb3bc453538ea5468da43033f21bb345cb1e9073f5094",
         requires=["gmp"],
         build_arguments=["--disable-documentation"],

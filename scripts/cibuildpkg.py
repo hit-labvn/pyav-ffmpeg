@@ -14,8 +14,18 @@ from dataclasses import dataclass, field, replace
 
 from pkg import *
 
-def fetch(url: str, path: str) -> None:
-    run(["curl", "-L", "-o", path, url])
+def fetch(url: str, path: str, attempts: int = 3) -> None:
+    # Retried here because curl's --retry skips connection resets, and the curl in
+    # older build images is too old for --retry-all-errors.
+    for attempt in range(1, attempts + 1):
+        try:
+            run(["curl", "-L", "--connect-timeout", "30", "-o", path, url])
+            return
+        except subprocess.CalledProcessError:
+            if attempt == attempts:
+                raise
+            print(f"Download failed, retrying ({attempt}/{attempts}): {url}")
+            time.sleep(5)
 
 
 @contextlib.contextmanager
