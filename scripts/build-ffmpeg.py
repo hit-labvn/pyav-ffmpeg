@@ -104,6 +104,9 @@ def main():
     # hardware encoders/decoders on modern integrated and discrete Intel GPUs.
     use_libvpl = plat in {"Linux", "Windows"} and not is_arm
 
+    # VAAPI encodes on Intel and AMD GPUs, and QSV needs it to reach the GPU on Linux.
+    use_libva = plat == "Linux" and is_x86
+
     # FFmpeg only needs the headers. It loads the Vulkan library from the system at runtime.
     use_vulkan = plat in {"Linux", "Windows"} and is_x86
 
@@ -176,6 +179,7 @@ def main():
         "--enable-libass",
         "--enable-libdav1d",
         "--enable-libmp3lame",
+        "--enable-libopenh264",
         "--enable-libopus",
         "--enable-libsvtav1",
         "--enable-libvmaf",
@@ -193,6 +197,9 @@ def main():
 
     if use_libvpl:
         ffmpeg_package.build_arguments.append("--enable-libvpl")
+
+    if use_libva:
+        ffmpeg_package.build_arguments.append("--enable-vaapi")
 
     if use_vulkan:
         ffmpeg_package.build_arguments.append("--enable-vulkan")
@@ -244,6 +251,8 @@ def main():
         packages += [amfheaders_package]
     if use_libvpl:
         packages += [libvpl_package]
+    if use_libva:
+        packages += [libva_package]
     if use_vulkan:
         packages += [vulkanheaders_package]
 

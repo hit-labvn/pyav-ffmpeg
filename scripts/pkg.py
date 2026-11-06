@@ -119,6 +119,15 @@ codec_group = [
         ],
     ),
     Package(
+        name="openh264",
+        source_url="https://github.com/cisco/openh264/archive/refs/tags/v2.7.0.tar.gz",
+        source_filename="openh264-2.7.0.tar.gz",
+        sha256="5178775c8b440073e70920e97d195efff721c0e56d0a78cc82c919e95d54924d",
+        requires=["nasm"],
+        build_system="meson",
+        build_arguments=["-Dtests=disabled"],
+    ),
+    Package(
         name="libvmaf",
         source_url="https://github.com/Netflix/vmaf/archive/refs/tags/v3.2.1.tar.gz",
         source_filename="vmaf-3.2.1.tar.gz",
@@ -237,6 +246,20 @@ libvpl_package = Package(
     ],
 )
 
+libva_package = Package(
+    name="libva",
+    source_url="https://github.com/intel/libva/releases/download/2.24.1/libva-2.24.1.tar.bz2",
+    sha256="eec6050b52876f229bd35e9df17cd31a06785e18e6f7990c445b584628483d67",
+    build_system="meson",
+    build_arguments=[
+        # GPU drivers come from the system, not from the build prefix.
+        "-Ddriverdir=/usr/lib/x86_64-linux-gnu/dri:/usr/lib64/dri:/usr/lib/dri:/usr/local/lib/dri",
+        "-Dwith_x11=no",
+        "-Dwith_glx=no",
+        "-Dwith_wayland=no",
+    ],
+)
+
 vulkanheaders_package = Package(
     name="vulkan-headers",
     source_url="https://github.com/KhronosGroup/Vulkan-Headers/archive/refs/tags/v1.4.350.tar.gz",
@@ -272,6 +295,7 @@ all_packages.extend(
         nvheaders_package,
         amfheaders_package,
         libvpl_package,
+        libva_package,
         vulkanheaders_package,
     ]
 )
